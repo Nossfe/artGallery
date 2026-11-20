@@ -292,3 +292,68 @@ describe('Seguridad', () => {
     expect(db.prepare('SELECT COUNT(*) c FROM artworks').get().c).toBe(1);
   });
 });
+
+describe('Enlace de compra por WhatsApp y estilos', () => {
+  const settings = (valor) => {
+    db.prepare("DELETE FROM settings WHERE key = 'whatsapp_number'").run();
+    if (valor !== null) db.prepare("INSERT INTO settings (key, value) VALUES ('whatsapp_number', ?)").run(valor);
+  };
+  beforeEach(() => settings(null));
+
+  it('genera una URL wa.me correcta y codificada para obras disponibles', async () => {
+    const { body } = await crear({ nombre: 'Atardecer «sur» & más' });
+    const lista = await request(app).get('/api/artworks');
+    const url = new URL(lista.body.data[0].whatsapp_url);
+    expect(url.origin).toBe('https://wa.me');
+    expect(url.pathname).toBe('/573001234567');
+
+    const texto = url.searchParams.get('text');
+    expect(texto).toContain('Hola, me interesa la obra «Atardecer «sur» & más» (60 × 40 cm) con precio ');
+    expect(texto).toMatch(/\$\s?1\.500\.000\. ¿Sigue disponible\?$/);
+    // El texto va codificado: sin espacios ni & sin escapar en la query
+    expect(lista.body.data[0].whatsapp_url).not.toMatch(/ |&(?!text)/);
+    expect(lista.body.data[0].whatsapp_url).toContain('%26');
+    expect((await request(app).get(`/api/artworks/${body.data.id}`)).body.data.whatsapp_url).toBeTruthy();
+  });
+
+  it('omite las medidas del mensaje si la obra no las tiene', async () => {
+    await crear({ ancho_cm: undefined, alto_cm: undefined });
+    const { body } = await request(app).get('/api/artworks');
+    const texto = new URL(body.data[0].whatsapp_url).searchParams.get('text');
+    expect(texto).toMatch(/^Hola, me interesa la obra «Atardecer» con precio /);
+  });
+
+  it('no entrega enlace si la obra está vendida (lo decide el servidor)', async () => {
+    const { body } = await crear();
+    await admin.patch(`/api/artworks/${body.data.id}/sold`).send({ vendida: true });
+    const res = await request(app).get(`/api/artworks/${body.data.id}`);
+    expect(res.body.data.vendida).toBe(true);
+    expect(res.body.data.whatsapp_url).toBeNull();
+    await admin.patch(`/api/artworks/${body.data.id}/sold`).send({ vendida: false });
+    expect((await request(app).get(`/api/artworks/${body.data.id}`)).body.data.whatsapp_url).toBeTruthy();
+  });
+
+  it('usa el número de la tabla settings y lo limpia a solo dígitos', async () => {
+    await crear();
+    settings('+57 (310) 555-0000');
+    const { body } = await request(app).get('/api/artworks');
+    expect(new URL(body.data[0].whatsapp_url).pathname).toBe('/573105550000');
+  });
+
+  it('usa el número del entorno como respaldo si settings está vacío', async () => {
+    await crear();
+    settings('');
+    const { body } = await request(app).get('/api/artworks');
+    expect(new URL(body.data[0].whatsapp_url).pathname).toBe('/573001234567');
+  });
+
+  it('GET /estilos devuelve los estilos distintos ordenados', async () => {
+    await crear({ estilo_tecnica: 'Óleo' });
+    await crear({ estilo_tecnica: 'Acuarela' });
+    await crear({ estilo_tecnica: 'Óleo' });
+    await crear({ estilo_tecnica: '' });
+    const res = await request(app).get('/api/artworks/estilos');
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual(['Acuarela', 'Óleo']);
+  });
+});

@@ -51,6 +51,11 @@
   .boton-peligro {
     @apply inline-flex items-center justify-center border border-vendida bg-white px-4 py-2 text-sm text-vendida transition-colors hover:bg-vendida hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
   }
+  /* Controles del lightbox */
+  .lb-btn {
+    @apply inline-flex h-11 min-w-[2.75rem] items-center justify-center border border-lienzo/40 bg-tinta px-3 text-lg text-lienzo transition-colors hover:bg-lienzo hover:text-tinta disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-tinta disabled:hover:text-lienzo;
+  }
+
   .interruptor {
     @apply relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-piedra transition-colors aria-checked:bg-vendida disabled:cursor-wait disabled:opacity-60;
   }

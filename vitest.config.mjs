@@ -13,6 +13,7 @@ export default defineConfig({
       ADMIN_EMAIL: '',
       ADMIN_PASSWORD: '',
       CORS_ORIGIN: 'http://origen-permitido.test',
+      WHATSAPP_NUMBER: '573001234567',
     },
   },
 });

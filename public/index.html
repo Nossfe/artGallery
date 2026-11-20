@@ -27,12 +27,41 @@
     </div>
   </header>
 
-  <main id="contenido" class="mx-auto w-full max-w-6xl flex-1 px-6 py-20">
+  <main id="contenido" class="mx-auto w-full max-w-6xl flex-1 px-6 py-16">
     <section class="mx-auto max-w-2xl text-center">
       <p class="enlace-nav">Pinturas originales</p>
       <h1 class="mt-4 text-5xl leading-tight md:text-6xl">Obras que merecen un muro</h1>
-      <p class="mt-6 text-lg text-piedra">Muy pronto podrás explorar la colección completa y adquirir tu pieza favorita directamente por WhatsApp.</p>
-      <p class="mt-10"><span class="boton" aria-disabled="true">Próximamente</span></p>
+      <p class="mt-6 text-lg text-piedra">Explora la colección y adquiere tu pieza favorita directamente por WhatsApp.</p>
+    </section>
+
+    <section aria-labelledby="titulo-filtros" class="mt-16">
+      <h2 id="titulo-filtros" class="sr-only">Filtrar obras</h2>
+      <div class="flex flex-col gap-4 border-y border-piedra-claro py-5 sm:flex-row sm:items-end">
+        <div class="sm:w-64">
+          <label for="filtro-estilo" class="etiqueta">Estilo / técnica</label>
+          <select id="filtro-estilo" class="campo">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="sm:w-48">
+          <label for="filtro-disponibilidad" class="etiqueta">Disponibilidad</label>
+          <select id="filtro-disponibilidad" class="campo">
+            <option value="">Todas</option>
+            <option value="disponibles">Disponibles</option>
+            <option value="vendidas">Vendidas</option>
+          </select>
+        </div>
+        <button id="btn-limpiar" type="button" class="boton-secundario" hidden>Quitar filtros</button>
+        <p id="galeria-resumen" class="text-sm text-piedra sm:ml-auto" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section aria-label="Galería de obras" class="mt-10">
+      <div id="galeria-estado" class="py-16 text-center text-piedra" aria-live="polite" hidden></div>
+      <ul id="galeria" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"></ul>
+      <div id="mas-wrap" class="mt-12 text-center" hidden>
+        <button id="btn-mas" type="button" class="boton-secundario px-8 py-3">Ver más obras</button>
+      </div>
     </section>
   </main>
 
@@ -44,5 +73,6 @@
   </footer>
 
   <script type="module" src="/js/layout.js"></script>
+  <script type="module" src="/js/gallery.js"></script>
 </body>
 </html>

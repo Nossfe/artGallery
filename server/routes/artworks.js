@@ -9,6 +9,7 @@ function createArtworksRouter(imageService) {
 
   // Públicas
   router.get('/', c.list);
+  router.get('/estilos', c.estilos);
   router.get('/:id', c.get);
 
   // Protegidas (admin). La autenticación va antes de procesar la subida.

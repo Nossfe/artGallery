@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { thumbnailUrl } = require('../utils/images');
+const { getWhatsappNumber, buildWhatsappUrl } = require('../utils/whatsapp');
 const { artworkSchema, soldSchema, listQuerySchema } = require('../utils/artworkSchemas');
 
 const COLUMNS = `id, nombre, precio, ancho_cm, alto_cm, profundidad_cm, estilo_tecnica,
@@ -12,8 +13,11 @@ function httpError(status, message, detalles) {
   return err;
 }
 
-function toDto(row) {
-  return { ...row, vendida: Boolean(row.vendida), imagen_thumb_url: thumbnailUrl(row.imagen_url) };
+// whatsapp_url es null si la obra está vendida: el servidor no entrega enlace de compra.
+function toDto(row, number = getWhatsappNumber()) {
+  const dto = { ...row, vendida: Boolean(row.vendida), imagen_thumb_url: thumbnailUrl(row.imagen_url) };
+  dto.whatsapp_url = buildWhatsappUrl(dto, number);
+  return dto;
 }
 
 function parseBody(schema, body) {
@@ -77,10 +81,18 @@ function createArtworksController(imageService) {
         .prepare(`SELECT ${COLUMNS} FROM artworks ${clause} ORDER BY created_at DESC, id DESC LIMIT ? OFFSET ?`)
         .all(...params, limit, (page - 1) * limit);
 
+      const number = getWhatsappNumber();
       res.json({
-        data: rows.map(toDto),
+        data: rows.map((r) => toDto(r, number)),
         pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
       });
+    },
+
+    estilos(req, res) {
+      const rows = db
+        .prepare("SELECT DISTINCT estilo_tecnica AS estilo FROM artworks WHERE estilo_tecnica IS NOT NULL AND estilo_tecnica <> '' ORDER BY estilo_tecnica COLLATE NOCASE")
+        .all();
+      res.json({ data: rows.map((r) => r.estilo) });
     },
 
     get(req, res) {
