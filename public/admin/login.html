@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acceso administrador | Galería de Arte</title>
+  <meta name="description" content="Acceso al panel de administración de la galería.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="flex min-h-screen flex-col items-center justify-center px-6 py-12">
+  <main class="w-full max-w-sm">
+    <p class="text-center"><a href="/" class="enlace-nav">← Volver a la galería</a></p>
+    <h1 class="mt-8 text-center text-4xl">Acceso administrador</h1>
+    <p class="mt-2 text-center text-piedra">Ingresa para gestionar las obras.</p>
+
+    <form id="form-login" class="mt-10 space-y-5 bg-white p-8 shadow-tarjeta" novalidate>
+      <p id="error-login" role="alert" class="mensaje-error border-l-4 border-vendida bg-lienzo px-3 py-2" hidden></p>
+      <div>
+        <label for="email" class="etiqueta">Correo electrónico</label>
+        <input id="email" name="email" type="email" autocomplete="username" required class="campo">
+      </div>
+      <div>
+        <label for="password" class="etiqueta">Contraseña</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required class="campo">
+      </div>
+      <button id="btn-login" type="submit" class="boton w-full">Entrar</button>
+    </form>
+  </main>
+  <script type="module" src="/js/admin-login.js"></script>
+</body>
+</html>

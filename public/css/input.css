@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  [hidden] {
+    display: none !important;
+  }
   html {
     @apply bg-lienzo text-tinta font-sans antialiased;
   }
@@ -27,5 +30,34 @@
   }
   .insignia-vendida {
     @apply bg-vendida px-3 py-1 text-xs uppercase tracking-galeria text-white;
+  }
+
+  /* Formularios y panel de administración */
+  .etiqueta {
+    @apply mb-1 block text-sm text-piedra;
+  }
+  .campo {
+    @apply w-full border border-piedra-claro bg-white px-3 py-2 text-tinta placeholder:text-piedra/60 focus:border-acento;
+  }
+  .campo[aria-invalid='true'] {
+    @apply border-vendida;
+  }
+  .mensaje-error {
+    @apply mt-1 text-sm text-vendida;
+  }
+  .boton-secundario {
+    @apply inline-flex items-center justify-center border border-piedra-claro bg-white px-4 py-2 text-sm text-tinta transition-colors hover:border-tinta disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .boton-peligro {
+    @apply inline-flex items-center justify-center border border-vendida bg-white px-4 py-2 text-sm text-vendida transition-colors hover:bg-vendida hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .interruptor {
+    @apply relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-piedra transition-colors aria-checked:bg-vendida disabled:cursor-wait disabled:opacity-60;
+  }
+  .interruptor-perilla {
+    @apply inline-block h-5 w-5 translate-x-0.5 rounded-full bg-white transition-transform;
+  }
+  .interruptor[aria-checked='true'] .interruptor-perilla {
+    @apply translate-x-[22px];
   }
 }

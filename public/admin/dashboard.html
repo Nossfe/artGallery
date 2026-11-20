@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de administración | Galería de Arte</title>
+  <meta name="description" content="Gestión de las obras de la galería.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="min-h-screen">
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:bg-tinta focus:px-4 focus:py-2 focus:text-lienzo">Saltar al contenido</a>
+
+  <header class="border-b border-piedra-claro">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-5">
+      <p class="font-serif text-2xl tracking-wide">Panel de administración</p>
+      <div class="flex items-center gap-5">
+        <span id="admin-email" class="hidden text-sm text-piedra sm:inline"></span>
+        <a href="/" class="enlace-nav">Ver sitio</a>
+        <button id="btn-logout" type="button" class="enlace-nav">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido" class="mx-auto max-w-6xl px-6 py-10" hidden>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-4xl">Obras</h1>
+        <p id="resumen" class="mt-1 text-sm text-piedra" aria-live="polite"></p>
+      </div>
+      <button id="btn-nueva" type="button" class="boton">Nueva obra</button>
+    </div>
+
+    <form id="form-busqueda" role="search" class="mt-8" novalidate>
+      <label for="busqueda" class="etiqueta">Buscar obra</label>
+      <input id="busqueda" type="search" maxlength="100" placeholder="Nombre, descripción o técnica" class="campo sm:max-w-md" autocomplete="off">
+    </form>
+
+    <div id="lista-estado" class="mt-10 text-center text-piedra" aria-live="polite"></div>
+    <ul id="lista" class="mt-6 divide-y divide-piedra-claro border-y border-piedra-claro" aria-label="Lista de obras"></ul>
+
+    <nav id="paginacion" class="mt-8 flex items-center justify-between" aria-label="Paginación" hidden>
+      <button id="btn-prev" type="button" class="boton-secundario">Anterior</button>
+      <p id="pagina-info" class="text-sm text-piedra"></p>
+      <button id="btn-next" type="button" class="boton-secundario">Siguiente</button>
+    </nav>
+  </main>
+
+  <!-- Formulario crear / editar -->
+  <dialog id="dlg-obra" aria-labelledby="dlg-obra-titulo" class="w-[calc(100%-2rem)] max-w-2xl bg-lienzo p-0 text-tinta shadow-tarjeta backdrop:bg-tinta/50">
+    <form id="form-obra" class="p-6 sm:p-8" novalidate>
+      <h2 id="dlg-obra-titulo" class="text-3xl"></h2>
+      <p id="error-form" role="alert" class="mensaje-error mt-4 border-l-4 border-vendida bg-white px-3 py-2" hidden></p>
+
+      <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label for="f-nombre" class="etiqueta">Nombre *</label>
+          <input id="f-nombre" name="nombre" type="text" maxlength="200" required class="campo" aria-describedby="e-nombre">
+          <p id="e-nombre" class="mensaje-error" hidden></p>
+        </div>
+        <div>
+          <label for="f-precio" class="etiqueta">Precio (COP) *</label>
+          <input id="f-precio" name="precio" type="number" min="1" step="1" inputmode="numeric" required class="campo" aria-describedby="e-precio">
+          <p id="e-precio" class="mensaje-error" hidden></p>
+        </div>
+        <div>
+          <label for="f-estilo" class="etiqueta">Estilo / técnica</label>
+          <input id="f-estilo" name="estilo_tecnica" type="text" maxlength="120" placeholder="Óleo sobre lienzo" class="campo" aria-describedby="e-estilo_tecnica">
+          <p id="e-estilo_tecnica" class="mensaje-error" hidden></p>
+        </div>
+        <div>
+          <label for="f-ancho" class="etiqueta">Ancho (cm)</label>
+          <input id="f-ancho" name="ancho_cm" type="number" min="0.1" step="any" inputmode="decimal" class="campo" aria-describedby="e-ancho_cm">
+          <p id="e-ancho_cm" class="mensaje-error" hidden></p>
+        </div>
+        <div>
+          <label for="f-alto" class="etiqueta">Alto (cm)</label>
+          <input id="f-alto" name="alto_cm" type="number" min="0.1" step="any" inputmode="decimal" class="campo" aria-describedby="e-alto_cm">
+          <p id="e-alto_cm" class="mensaje-error" hidden></p>
+        </div>
+        <div>
+          <label for="f-prof" class="etiqueta">Profundidad (cm, opcional)</label>
+          <input id="f-prof" name="profundidad_cm" type="number" min="0.1" step="any" inputmode="decimal" class="campo" aria-describedby="e-profundidad_cm">
+          <p id="e-profundidad_cm" class="mensaje-error" hidden></p>
+        </div>
+        <div class="flex items-end">
+          <label class="flex items-center gap-3 pb-2 text-sm">
+            <input id="f-vendida" name="vendida" type="checkbox" class="h-4 w-4 accent-acento">
+            Obra vendida
+          </label>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="f-descripcion" class="etiqueta">Descripción</label>
+          <textarea id="f-descripcion" name="descripcion" rows="4" maxlength="5000" class="campo" aria-describedby="e-descripcion"></textarea>
+          <p id="e-descripcion" class="mensaje-error" hidden></p>
+        </div>
+        <div class="sm:col-span-2">
+          <label for="f-imagen" class="etiqueta">Imagen <span id="imagen-req">*</span></label>
+          <input id="f-imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp" class="campo bg-white file:mr-4 file:border-0 file:bg-marfil file:px-3 file:py-1 file:text-sm" aria-describedby="e-imagen ayuda-imagen">
+          <p id="ayuda-imagen" class="mt-1 text-xs text-piedra">JPG, PNG o WebP. Máximo 8 MB.</p>
+          <p id="e-imagen" class="mensaje-error" hidden></p>
+          <div id="preview-wrap" class="mt-4" hidden>
+            <p class="text-xs uppercase tracking-galeria text-piedra">Vista previa</p>
+            <img id="preview" alt="Vista previa de la imagen seleccionada" class="mt-2 max-h-64 w-auto max-w-full bg-marfil object-contain">
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button id="btn-cancelar" type="button" class="boton-secundario">Cancelar</button>
+        <button id="btn-guardar" type="submit" class="boton">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmación de eliminación -->
+  <dialog id="dlg-borrar" aria-labelledby="dlg-borrar-titulo" aria-describedby="dlg-borrar-texto" class="w-[calc(100%-2rem)] max-w-md bg-lienzo p-0 text-tinta shadow-tarjeta backdrop:bg-tinta/50">
+    <div class="p-6 sm:p-8">
+      <h2 id="dlg-borrar-titulo" class="text-2xl">Eliminar obra</h2>
+      <p id="dlg-borrar-texto" class="mt-3 text-piedra"></p>
+      <p id="error-borrar" role="alert" class="mensaje-error mt-3" hidden></p>
+      <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button id="btn-borrar-no" type="button" class="boton-secundario">Cancelar</button>
+        <button id="btn-borrar-si" type="button" class="boton-peligro">Eliminar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="avisos" class="fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-2" aria-live="polite"></div>
+
+  <script type="module" src="/js/admin.js"></script>
+</body>
+</html>
