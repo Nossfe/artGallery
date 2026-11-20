@@ -29,3 +29,6 @@ Thumbs.db
 
 # Cobertura de pruebas
 coverage/
+
+.AGENTS.md
+AGENTS.md
