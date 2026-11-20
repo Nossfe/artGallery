@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { el } from './ui.js';
+import { el, setOgImage } from './ui.js';
 import { formatCOP, formatDimensions } from './format.js';
 import { openLightbox } from './lightbox.js';
 
@@ -58,6 +58,7 @@ async function load({ append = false } = {}) {
     if (id !== state.loadId) return;
     state.total = res.pagination.total;
     state.totalPages = res.pagination.totalPages;
+    if (!append && res.data[0]?.imagen_url) setOgImage(res.data[0].imagen_url);
     if (!append) grid.replaceChildren();
     grid.append(...res.data.map(renderCard));
     render();

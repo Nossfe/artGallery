@@ -1,5 +1,5 @@
 import { api } from './api.js';
-import { el } from './ui.js';
+import { el, setOgImage } from './ui.js';
 
 const $ = (id) => document.getElementById(id);
 const estado = $('acerca-estado');
@@ -41,6 +41,7 @@ function renderAbout(a) {
   const fotoWrap = $('foto-wrap');
   const bioCol = $('bio-col');
   if (a.foto_url) {
+    setOgImage(a.foto_url);
     const img = $('artista-foto');
     img.src = a.foto_url;
     img.alt = a.nombre ? `Retrato de ${a.nombre}` : 'Retrato de la artista';

@@ -31,3 +31,15 @@ export function debounce(fn, ms = 300) {
     t = setTimeout(() => fn(...args), ms);
   };
 }
+
+/** Actualiza o crea <meta property="og:image"> con la URL de la obra o foto. */
+export function setOgImage(url) {
+  if (!url) return;
+  let meta = document.querySelector('meta[property="og:image"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.setAttribute('property', 'og:image');
+    document.head.append(meta);
+  }
+  meta.setAttribute('content', url);
+}
