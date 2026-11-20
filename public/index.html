@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galería de Arte | Pinturas originales</title>
+  <meta name="description" content="Galería de pinturas originales. Conoce las obras disponibles y cómprala por WhatsApp.">
+  <meta property="og:title" content="Galería de Arte">
+  <meta property="og:description" content="Pinturas originales disponibles para la venta.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="flex min-h-screen flex-col">
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:bg-tinta focus:px-4 focus:py-2 focus:text-lienzo">Saltar al contenido</a>
+
+  <header class="border-b border-piedra-claro">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+      <a href="/" class="font-serif text-2xl tracking-wide">Galería de Arte</a>
+      <button id="menu-toggle" type="button" class="enlace-nav md:hidden" aria-expanded="false" aria-controls="menu-principal">Menú</button>
+      <nav id="menu-principal" aria-label="Principal" class="hidden w-full flex-col gap-4 pt-4 md:flex md:w-auto md:flex-row md:gap-8 md:pt-0">
+        <a href="/" class="enlace-nav" aria-current="page">Galería</a>
+        <a href="/acerca.html" class="enlace-nav">Acerca de mí</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido" class="mx-auto w-full max-w-6xl flex-1 px-6 py-20">
+    <section class="mx-auto max-w-2xl text-center">
+      <p class="enlace-nav">Pinturas originales</p>
+      <h1 class="mt-4 text-5xl leading-tight md:text-6xl">Obras que merecen un muro</h1>
+      <p class="mt-6 text-lg text-piedra">Muy pronto podrás explorar la colección completa y adquirir tu pieza favorita directamente por WhatsApp.</p>
+      <p class="mt-10"><span class="boton" aria-disabled="true">Próximamente</span></p>
+    </section>
+  </main>
+
+  <footer class="border-t border-piedra-claro">
+    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 py-8 text-sm text-piedra md:flex-row">
+      <p>&copy; <span id="anio"></span> Galería de Arte. Todos los derechos reservados.</p>
+      <a href="/admin/login.html" class="text-xs opacity-60 transition-opacity hover:opacity-100">Admin</a>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/layout.js"></script>
+</body>
+</html>

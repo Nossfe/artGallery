@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-lienzo text-tinta font-sans antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-serif font-medium;
+  }
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-acento;
+  }
+}
+
+@layer components {
+  .enlace-nav {
+    @apply text-sm uppercase tracking-galeria text-piedra transition-colors hover:text-tinta;
+  }
+  .boton {
+    @apply inline-flex items-center justify-center border border-tinta bg-tinta px-6 py-3 text-sm uppercase tracking-galeria text-lienzo transition-colors hover:bg-acento-oscuro hover:border-acento-oscuro disabled:cursor-not-allowed disabled:border-piedra-claro disabled:bg-piedra-claro disabled:text-piedra;
+  }
+  /* Estilo de tarjeta: sin bordes pesados, la obra es la protagonista */
+  .tarjeta-obra {
+    @apply bg-white shadow-tarjeta transition-transform duration-300 hover:-translate-y-1;
+  }
+  .insignia-vendida {
+    @apply bg-vendida px-3 py-1 text-xs uppercase tracking-galeria text-white;
+  }
+}
