@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acerca de mí | Panel de administración</title>
+  <meta name="description" content="Edición de la página Acerca de mí y los datos de contacto.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="min-h-screen">
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:bg-tinta focus:px-4 focus:py-2 focus:text-lienzo">Saltar al contenido</a>
+
+  <header class="border-b border-piedra-claro">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-5">
+      <div class="flex flex-wrap items-center gap-6">
+        <p class="font-serif text-2xl tracking-wide">Panel de administración</p>
+        <nav aria-label="Secciones del panel" class="flex items-center gap-5">
+          <a href="/admin/dashboard.html" class="enlace-nav">Obras</a>
+          <a href="/admin/acerca.html" class="enlace-nav text-tinta" aria-current="page">Acerca de mí</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-5">
+        <span id="admin-email" class="hidden text-sm text-piedra sm:inline"></span>
+        <a href="/acerca.html" class="enlace-nav">Ver página</a>
+        <button id="btn-logout" type="button" class="enlace-nav">Cerrar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido" class="mx-auto max-w-3xl px-6 py-10" hidden>
+    <h1 class="text-4xl">Acerca de mí y contacto</h1>
+    <p class="mt-2 text-sm text-piedra">Esta información aparece en la página pública y el número de WhatsApp también se usa en los botones «Comprar» de la galería.</p>
+
+    <div id="acerca-estado" class="mt-8 text-piedra" aria-live="polite"></div>
+
+    <form id="form-acerca" class="mt-8 space-y-6 bg-white p-6 shadow-tarjeta sm:p-8" novalidate hidden>
+      <p id="error-form" role="alert" class="mensaje-error border-l-4 border-vendida bg-lienzo px-3 py-2" hidden></p>
+
+      <div>
+        <label for="f-nombre" class="etiqueta">Nombre de la artista</label>
+        <input id="f-nombre" name="nombre" type="text" maxlength="120" class="campo" aria-describedby="e-nombre">
+        <p id="e-nombre" class="mensaje-error" hidden></p>
+      </div>
+
+      <div>
+        <label for="f-biografia" class="etiqueta">Biografía</label>
+        <textarea id="f-biografia" name="biografia" rows="6" maxlength="5000" class="campo" aria-describedby="e-biografia"></textarea>
+        <p id="e-biografia" class="mensaje-error" hidden></p>
+      </div>
+
+      <div>
+        <label for="f-foto" class="etiqueta">Foto de la artista</label>
+        <input id="f-foto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" class="campo bg-white file:mr-4 file:border-0 file:bg-marfil file:px-3 file:py-1 file:text-sm" aria-describedby="e-foto ayuda-foto">
+        <p id="ayuda-foto" class="mt-1 text-xs text-piedra">JPG, PNG o WebP. Máximo 8 MB. Déjalo vacío para conservar la foto actual.</p>
+        <p id="e-foto" class="mensaje-error" hidden></p>
+        <div id="preview-wrap" class="mt-4" hidden>
+          <p class="text-xs uppercase tracking-galeria text-piedra">Vista previa</p>
+          <img id="preview" alt="Vista previa de la foto de la artista" class="mt-2 max-h-64 w-auto max-w-full bg-marfil object-contain">
+          <div class="mt-3">
+            <label class="inline-flex items-center gap-2 text-sm text-piedra">
+              <input id="f-eliminar-foto" name="eliminar_foto" type="checkbox" class="h-4 w-4 accent-vendida">
+              Quitar la foto actual al guardar
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-piedra-claro pt-6">
+        <fieldset class="space-y-5">
+          <legend class="mb-4 font-serif text-2xl">Datos de contacto</legend>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="f-whatsapp" class="etiqueta">Número de WhatsApp</label>
+              <input id="f-whatsapp" name="whatsapp" type="tel" inputmode="numeric" placeholder="573001234567" maxlength="20" class="campo" aria-describedby="e-whatsapp ayuda-whatsapp">
+              <p id="ayuda-whatsapp" class="mt-1 text-xs text-piedra">Solo dígitos con código de país (sin + ni espacios). Ej.: 573001234567.</p>
+              <p id="e-whatsapp" class="mensaje-error" hidden></p>
+            </div>
+
+            <div>
+              <label for="f-email" class="etiqueta">Correo de contacto</label>
+              <input id="f-email" name="email" type="email" maxlength="254" placeholder="hola@ejemplo.com" class="campo" aria-describedby="e-email">
+              <p id="e-email" class="mensaje-error" hidden></p>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label for="f-ubicacion" class="etiqueta">Ubicación</label>
+              <input id="f-ubicacion" name="ubicacion" type="text" maxlength="150" placeholder="Bogotá, Colombia" class="campo" aria-describedby="e-ubicacion">
+              <p id="e-ubicacion" class="mensaje-error" hidden></p>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="border-t border-piedra-claro pt-6">
+        <fieldset class="space-y-5">
+          <legend class="mb-4 font-serif text-2xl">Redes sociales</legend>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="f-instagram" class="etiqueta">Instagram (URL completa)</label>
+              <input id="f-instagram" name="instagram" type="url" maxlength="300" placeholder="https://instagram.com/tuusuario" class="campo" aria-describedby="e-instagram">
+              <p id="e-instagram" class="mensaje-error" hidden></p>
+            </div>
+
+            <div>
+              <label for="f-facebook" class="etiqueta">Facebook (URL completa)</label>
+              <input id="f-facebook" name="facebook" type="url" maxlength="300" placeholder="https://facebook.com/tupagina" class="campo" aria-describedby="e-facebook">
+              <p id="e-facebook" class="mensaje-error" hidden></p>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label for="f-tiktok" class="etiqueta">TikTok (URL completa)</label>
+              <input id="f-tiktok" name="tiktok" type="url" maxlength="300" placeholder="https://tiktok.com/@tuusuario" class="campo" aria-describedby="e-tiktok">
+              <p id="e-tiktok" class="mensaje-error" hidden></p>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button id="btn-guardar" type="submit" class="boton">Guardar cambios</button>
+      </div>
+    </form>
+  </main>
+
+  <div id="avisos" class="fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-2" aria-live="polite"></div>
+
+  <script type="module" src="/js/admin-acerca.js"></script>
+</body>
+</html>

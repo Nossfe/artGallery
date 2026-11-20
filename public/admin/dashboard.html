@@ -16,7 +16,13 @@
 
   <header class="border-b border-piedra-claro">
     <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-5">
-      <p class="font-serif text-2xl tracking-wide">Panel de administración</p>
+      <div class="flex flex-wrap items-center gap-6">
+        <p class="font-serif text-2xl tracking-wide">Panel de administración</p>
+        <nav aria-label="Secciones del panel" class="flex items-center gap-5">
+          <a href="/admin/dashboard.html" class="enlace-nav text-tinta" aria-current="page">Obras</a>
+          <a href="/admin/acerca.html" class="enlace-nav">Acerca de mí</a>
+        </nav>
+      </div>
       <div class="flex items-center gap-5">
         <span id="admin-email" class="hidden text-sm text-piedra sm:inline"></span>
         <a href="/" class="enlace-nav">Ver sitio</a>

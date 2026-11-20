@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acerca de mí | Galería de Arte</title>
+  <meta name="description" content="Conoce a la artista, su historia y los canales de contacto para adquirir pinturas originales.">
+  <meta property="og:title" content="Acerca de mí | Galería de Arte">
+  <meta property="og:description" content="Biografía de la artista y datos de contacto.">
+  <meta property="og:type" content="profile">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="flex min-h-screen flex-col">
+  <a href="#contenido" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:bg-tinta focus:px-4 focus:py-2 focus:text-lienzo">Saltar al contenido</a>
+
+  <header class="border-b border-piedra-claro">
+    <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between px-6 py-6">
+      <a href="/" class="font-serif text-2xl tracking-wide">Galería de Arte</a>
+      <button id="menu-toggle" type="button" class="enlace-nav md:hidden" aria-expanded="false" aria-controls="menu-principal">Menú</button>
+      <nav id="menu-principal" aria-label="Principal" class="hidden w-full flex-col gap-4 pt-4 md:flex md:w-auto md:flex-row md:gap-8 md:pt-0">
+        <a href="/" class="enlace-nav">Galería</a>
+        <a href="/acerca.html" class="enlace-nav text-tinta" aria-current="page">Acerca de mí</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido" class="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
+    <div id="acerca-estado" class="py-16 text-center text-piedra" aria-live="polite">Cargando información…</div>
+
+    <article id="acerca-contenido" hidden>
+      <div class="grid gap-12 md:grid-cols-12 md:items-start">
+        <figure id="foto-wrap" class="md:col-span-5" hidden>
+          <img id="artista-foto" alt="Foto de la artista" class="aspect-[4/5] w-full bg-marfil object-cover shadow-tarjeta">
+        </figure>
+
+        <div id="bio-col" class="md:col-span-7">
+          <p class="enlace-nav">Acerca de mí</p>
+          <h1 id="artista-nombre" class="mt-4 text-5xl leading-tight md:text-6xl">La artista</h1>
+          <div id="artista-bio" class="mt-6 space-y-4 text-lg leading-relaxed text-piedra"></div>
+        </div>
+      </div>
+
+      <section id="seccion-contacto" aria-labelledby="titulo-contacto" class="mt-16 border-t border-piedra-claro pt-12" hidden>
+        <h2 id="titulo-contacto" class="text-3xl">Contacto</h2>
+        <div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div id="bloque-whatsapp" hidden>
+            <p class="enlace-nav">WhatsApp</p>
+            <p id="texto-whatsapp" class="mt-2 text-tinta"></p>
+            <a id="enlace-whatsapp" target="_blank" rel="noopener noreferrer" class="boton mt-4">Escribir por WhatsApp</a>
+          </div>
+
+          <div id="bloque-email" hidden>
+            <p class="enlace-nav">Correo electrónico</p>
+            <p class="mt-2">
+              <a id="enlace-email" class="text-tinta underline decoration-piedra-claro underline-offset-4 transition-colors hover:text-acento"></a>
+            </p>
+          </div>
+
+          <div id="bloque-ubicacion" hidden>
+            <p class="enlace-nav">Ubicación</p>
+            <p id="texto-ubicacion" class="mt-2 text-tinta"></p>
+          </div>
+        </div>
+
+        <div id="bloque-redes" class="mt-10 border-t border-piedra-claro pt-8" hidden>
+          <p class="enlace-nav">Redes sociales</p>
+          <ul id="lista-redes" class="mt-4 flex flex-wrap gap-4"></ul>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <footer class="border-t border-piedra-claro">
+    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-6 py-8 text-sm text-piedra md:flex-row">
+      <p>&copy; <span id="anio"></span> Galería de Arte. Todos los derechos reservados.</p>
+      <a href="/admin/login.html" class="text-xs opacity-60 transition-opacity hover:opacity-100">Admin</a>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/layout.js"></script>
+  <script type="module" src="/js/about.js"></script>
+</body>
+</html>

@@ -7,6 +7,7 @@ const env = require('./config/env');
 const db = require('./config/db');
 const { createAuthRouter } = require('./routes/auth');
 const { createArtworksRouter } = require('./routes/artworks');
+const { createAboutRouter } = require('./routes/about');
 const { cloudinaryImageService } = require('./utils/images');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
@@ -61,6 +62,7 @@ function createApp({ loginMaxAttempts, imageService = cloudinaryImageService } =
 
   app.use('/api/auth', createAuthRouter({ loginMaxAttempts }));
   app.use('/api/artworks', createArtworksRouter(imageService));
+  app.use('/api/about', createAboutRouter(imageService));
   app.use('/api', notFound);
 
   app.use(express.static(path.join(__dirname, '..', 'public')));
