@@ -4,7 +4,7 @@ Aplicación web para exhibir y vender pinturas originales, con panel de administ
 
 ## Requisitos previos
 
-- **Node.js** 18 o superior.
+- **Node.js** 22 o superior.
 - Cuenta gratuita en **Cloudinary** para alojar y optimizar las imágenes.
 - Número de **WhatsApp** con código de país (sin `+`, espacios ni guiones).
 
