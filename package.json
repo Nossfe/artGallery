@@ -6,11 +6,13 @@
   "main": "server/index.js",
   "scripts": {
     "dev": "concurrently -k -n server,css \"nodemon server/index.js\" \"npm run watch:css\"",
+    "build": "npm run build:css",
     "start": "node server/index.js",
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
     "watch:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
     "migrate": "node server/db/migrate.js",
     "seed:admin": "node server/db/seed-admin.js",
+    "backup:db": "node server/db/backup.js",
     "test": "vitest run"
   },
   "engines": {

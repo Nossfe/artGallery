@@ -6,6 +6,8 @@ const env = {
   port: Number(process.env.PORT) || 3000,
   isProduction: process.env.NODE_ENV === 'production',
   dbPath: process.env.DB_PATH || path.join(__dirname, '..', '..', 'data', 'gallery.db'),
+  backupDir: process.env.BACKUP_DIR || path.join(__dirname, '..', '..', 'backups'),
+  backupKeep: Math.max(1, Number(process.env.BACKUP_KEEP) || 14),
   whatsappNumber: process.env.WHATSAPP_NUMBER || '',
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',

@@ -30,7 +30,9 @@ Copia `.env.example` a `.env` y define los siguientes valores (nunca subas `.env
 | --- | --- | --- |
 | `NODE_ENV` | Entorno de ejecución | `development`, `production` o `test` |
 | `PORT` | Puerto HTTP de Express | `3000` |
-| `DB_PATH` | Ruta al archivo SQLite (opcional) | Por defecto `data/gallery.db` |
+| `DB_PATH` | Ruta al archivo SQLite (opcional) | Por defecto `data/gallery.db` (en producción apunta al disco persistente, ej. `/var/data/gallery.db`) |
+| `BACKUP_DIR` | Carpeta de respaldos locales (opcional) | Por defecto `backups/` (en producción usa una subcarpeta del disco persistente) |
+| `BACKUP_KEEP` | Número de respaldos a conservar (opcional) | Por defecto `14` |
 | `CLOUDINARY_CLOUD_NAME` | Nombre del cloud en Cloudinary | Dashboard → *Settings → API Keys* |
 | `CLOUDINARY_API_KEY` | API Key de Cloudinary | Dashboard → *Settings → API Keys* |
 | `CLOUDINARY_API_SECRET` | API Secret de Cloudinary | Dashboard → *Settings → API Keys* |
@@ -58,11 +60,13 @@ Copia `.env.example` a `.env` y define los siguientes valores (nunca subas `.env
 | Script | Descripción |
 | --- | --- |
 | `npm run dev` | Inicia el servidor con `nodemon` y Tailwind CSS en modo `--watch` |
+| `npm run build` | Prepara los archivos estáticos de producción (ejecuta `build:css`) |
 | `npm run build:css` | Compila y minifica `public/css/input.css` hacia `public/css/output.css` |
 | `npm run watch:css` | Compila el CSS automáticamente al detectar cambios |
 | `npm start` | Arranca el servidor en modo normal (`node server/index.js`) |
 | `npm run migrate` | Crea o actualiza las tablas (`admin`, `artworks`, `settings`) en SQLite |
 | `npm run seed:admin` | Crea o actualiza la única cuenta de administrador desde `.env` |
+| `npm run backup:db` | Genera un respaldo consistente de SQLite en caliente y rota respaldos antiguos |
 | `npm test` | Ejecuta la suite de pruebas automatizadas con Vitest y Supertest |
 
 ## Estructura del proyecto
@@ -88,9 +92,112 @@ Copia `.env.example` a `.env` y define los siguientes valores (nunca subas `.env
 ├─ data/                        # Base SQLite local (ignorada por Git)
 ├─ tailwind.config.js
 ├─ vitest.config.mjs
+├─ render.yaml                  # Blueprint opcional para desplegar en Render
 ├─ .env.example
 └─ AGENTS.md
 ```
+
+## Despliegue en producción
+
+### ¿Qué hosting elegir? (Importante: SQLite necesita disco persistente)
+
+Esta aplicación guarda las obras, la cuenta de administrador y la página «Acerca de mí» en un archivo **SQLite** (`.db`). En muchos servicios en la nube con plan gratuito, el disco del contenedor es **efímero**: cada vez que la app se reinicia o se hace un nuevo despliegue, cualquier archivo local se borra. Por eso es indispensable montar un **disco o volumen persistente** y apuntar `DB_PATH` a ese volumen (las imágenes ya viven en Cloudinary, así que no ocupan disco).
+
+Comparativa de las 3 opciones recomendadas:
+
+| Opción | Facilidad | Disco persistente | Cuándo conviene |
+| --- | --- | --- | --- |
+| **Railway** *(recomendado)* | Muy alta | Volumen persistente (~$0,25/GB al mes + plan Hobby) | Mejor equilibrio entre simplicidad, HTTPS automático y costo bajo para proyectos con SQLite |
+| **Render** | Muy alta (`render.yaml` incluido) | Persistent Disk (desde plan Starter ~$7/mes + $0,25/GB) | Ideal si prefieres configuración declarativa con Blueprint (`render.yaml`) y cero mantenimiento |
+| **VPS (Hetzner, DigitalOcean, etc.)** | Media | Disco SSD completo incluido (~$4–6/mes) | Mejor relación costo/control y cron nativo para respaldos, si te sientes cómodo administrando Linux |
+
+> **Regla importante:** con SQLite ejecuta siempre **una sola instancia** (réplica = 1) montada sobre el disco persistente.
+
+### Variables de entorno en producción
+
+Configura estas variables en el panel de tu hosting (nunca subas `.env` al repositorio):
+
+- `NODE_ENV=production` — activa `trust proxy`, redirección HTTP → HTTPS, cabeceras HSTS, `upgrade-insecure-requests` y `Secure` en la cookie de sesión.
+- `PORT` — la mayoría de PaaS (Render/Railway) lo inyectan automáticamente; en VPS usa `3000`.
+- `DB_PATH` — ruta dentro del disco persistente (ej. `/data/gallery.db` en Railway o `/var/data/gallery.db` en Render).
+- `BACKUP_DIR` — subcarpeta para respaldos dentro del volumen (ej. `/data/backups` o `/var/data/backups`).
+- `JWT_SECRET` — cadena aleatoria de al menos 32 caracteres (genera una **nueva** para producción).
+- `JWT_EXPIRES_IN=2h`
+- `ADMIN_EMAIL` y `ADMIN_PASSWORD` — contraseña fuerte de 12+ caracteres (tras crear el admin con `npm run seed:admin`, puedes retirar `ADMIN_PASSWORD` del panel si lo prefieres).
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `WHATSAPP_NUMBER` — solo dígitos con código de país (ej. `573001234567`).
+- `CORS_ORIGIN` — déjalo vacío si el frontend y la API se sirven desde el mismo dominio.
+
+### Opción A: Despliegue paso a paso en Railway (recomendado)
+
+1. Sube el repositorio a GitHub (asegúrate de que `.env`, `.env.example` con datos reales si existiera, y `*.db` no estén en Git).
+2. Crea un proyecto en [Railway](https://railway.app) → **Deploy from GitHub repo** y selecciona este repositorio.
+3. En la pestaña **Volumes** del servicio, agrega un volumen montado en `/data`.
+4. En **Settings → Build & Deploy**:
+   - **Build Command:** `npm ci --include=dev && npm run build` *(necesario para instalar `tailwindcss` y compilar `public/css/output.css` aunque `NODE_ENV=production` esté activo)*.
+   - **Start Command:** `npm start` *(al arrancar ejecuta `migrate()` automáticamente sobre `/data/gallery.db`)*.
+   - **Healthcheck Path:** `/api/health`.
+5. En **Variables**, carga todas las variables de producción con `DB_PATH=/data/gallery.db` y `BACKUP_DIR=/data/backups`.
+6. En **Settings → Networking**, genera el dominio público (incluye **HTTPS automático**).
+7. Crea la cuenta de administrador una sola vez desde la consola de Railway (o con `railway run`):
+   ```bash
+   npm run seed:admin
+   ```
+
+### Opción B: Despliegue paso a paso en Render
+
+El repositorio incluye [render.yaml](render.yaml) preconfigurado:
+
+1. Sube el repositorio a GitHub.
+2. En [Render](https://render.com), elige **New → Blueprint** y selecciona tu repositorio (detectará `render.yaml`, que configura el plan `starter`, el disco persistente en `/var/data`, `DB_PATH=/var/data/gallery.db`, `buildCommand` y `healthCheckPath`).
+3. Completa los valores de las variables marcadas con `sync: false` en el asistente de Render.
+4. Espera a que el despliegue quede en estado **Live** (Render provee **HTTPS automático**).
+5. Abre la pestaña **Shell** del servicio en Render y ejecuta una sola vez:
+   ```bash
+   npm run seed:admin
+   ```
+
+### Opción C: Despliegue en un VPS (Ubuntu + Nginx + PM2 + HTTPS)
+
+1. Instala Node.js 20+, Nginx, Certbot y PM2 (`npm install -g pm2`).
+2. Clona el repositorio (ej. en `/var/www/art-gallery`), crea el `.env` de producción con `NODE_ENV=production` y `DB_PATH=/var/lib/art-gallery/gallery.db`, y ejecuta:
+   ```bash
+   npm ci --include=dev
+   npm run build
+   npm run migrate
+   npm run seed:admin
+   pm2 start server/index.js --name galeria
+   pm2 save && pm2 startup
+   ```
+3. Configura Nginx como proxy inverso hacia `http://127.0.0.1:3000` enviando `X-Forwarded-Proto` y `X-Forwarded-For`, con `client_max_body_size 10m` (para admitir fotos de hasta 8 MB), y habilita HTTPS gratuito con Certbot (`sudo certbot --nginx -d tudominio.com`).
+
+### Verificación en la URL real
+
+Una vez desplegada la aplicación en su dominio `https://...`:
+
+1. Verifica `https://tu-dominio/api/health` → debe responder `200` con `{"status":"ok","db":true,"env":"production"}`.
+2. Entra a `https://tu-dominio/admin/login.html`, inicia sesión y confirma en las DevTools que la cookie `token` tiene `HttpOnly`, `SameSite=Strict` y `Secure`.
+3. Crea una obra de prueba con foto real y verifica que aparece en `https://tu-dominio/` con el botón «Comprar» apuntando a `https://wa.me/...`.
+4. Márcala como vendida en el panel y confirma que el botón queda deshabilitado en el sitio público.
+5. Edita «Acerca de mí» y comprueba que los cambios se ven en `https://tu-dominio/acerca.html`.
+
+### Estrategia de respaldo periódico de SQLite (`.db`)
+
+Como SQLite opera en modo `WAL`, **no** copies el archivo `.db` directamente con `cp` mientras el servidor está en marcha. Usa el script incluido, que utiliza la API oficial `db.backup()` de SQLite para generar una copia consistente en caliente y conservar automáticamente los últimos `BACKUP_KEEP` respaldos (por defecto 14):
+
+```bash
+npm run backup:db
+```
+
+**Recomendación de rutina (regla 3-2-1 ligera):**
+1. **Respaldo diario automático en el servidor:**
+   - En un **VPS**, agrega una tarea `cron` diaria a las 03:00 (`crontab -e`):
+     ```cron
+     0 3 * * * cd /var/www/art-gallery && /usr/bin/npm run backup:db >> /var/log/galeria-backup.log 2>&1
+     ```
+   - En **Railway** o **Render**, ejecuta `npm run backup:db` periódicamente desde un Cron Job conectado al mismo volumen (o desde la consola antes de cambios importantes).
+2. **Copia fuera del servidor (off-site):** un respaldo en el mismo disco no protege si el disco falla. Sube semanalmente el archivo `.db` más reciente a almacenamiento externo (por ejemplo, un bucket privado en Cloudflare R2 / S3 con `rclone`, o descárgalo a tu computador/Google Drive con `scp` o la CLI del hosting).
+3. **Prueba de restauración:** para restaurar un respaldo, detén la app, reemplaza el archivo en `DB_PATH` por la copia `.db` (borrando antes los archivos `-wal` y `-shm` viejos si existen) y vuelve a iniciar el servidor.
 
 ## Decisiones tomadas
 
@@ -122,3 +229,5 @@ Copia `.env.example` a `.env` y define los siguientes valores (nunca subas `.env
 - **Acerca de mí y contacto:** se guarda en la tabla `settings` mediante pares clave-valor (`about_nombre`, `about_biografia`, `about_foto_url`, `about_foto_public_id`, `whatsapp_number`, `about_email`, `about_ubicacion`, `about_instagram`, `about_facebook`, `about_tiktok`). Se exponen `GET /api/about` (público) y `PUT /api/about` (protegido, acepta `multipart/form-data` con campo `foto` o JSON).
 - **Redes sociales:** se soportan Instagram, Facebook y TikTok como URLs completas validadas con esquema `http://` o `https://` tanto en servidor como en cliente.
 - **SEO y Open Graph:** todas las páginas públicas incluyen `<title>`, meta descripción y etiquetas Open Graph (`og:title`, `og:description`, `og:type`, `og:locale`), y actualizan `og:image` dinámicamente con la primera obra de la galería o la foto de la artista.
+- **Producción y despliegue (Etapa 8):** en `NODE_ENV=production` la aplicación activa `trust proxy`, HSTS, `upgrade-insecure-requests`, cookie `Secure` y redirección `301` de `x-forwarded-proto: http` a HTTPS (excluyendo `/api/health` para los health checks internos). `server/index.js` ejecuta `migrate()` al arrancar (idempotente, ideal al montar un disco persistente nuevo) y maneja `SIGTERM`/`SIGINT` cerrando el servidor HTTP y SQLite limpiamente para hacer checkpoint del WAL.
+- **Build y respaldos:** se añadieron los scripts `npm run build` (alias de `build:css`) y `npm run backup:db` (`server/db/backup.js`), que utiliza `better-sqlite3` `db.backup()` para copias consistentes en caliente con rotación automática (`BACKUP_KEEP=14`). También se incluye `render.yaml` opcional y se ignora `backups/` en Git.

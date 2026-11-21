@@ -13,11 +13,11 @@ const loginSchema = z.object({
 // Hash falso para igualar el tiempo de respuesta cuando el correo no existe.
 const DUMMY_HASH = bcrypt.hashSync('contraseña-inexistente', 12);
 
-function cookieOptions(maxAgeMs) {
+function cookieOptions(maxAgeMs, secure = isProduction) {
   return {
     httpOnly: true,
     sameSite: 'strict',
-    secure: isProduction,
+    secure,
     path: '/',
     ...(maxAgeMs ? { maxAge: maxAgeMs } : {}),
   };
@@ -39,7 +39,8 @@ async function login(req, res, next) {
       expiresIn: jwtExpiresIn,
     });
     const { exp } = jwt.decode(token);
-    res.cookie(COOKIE_NAME, token, cookieOptions(exp * 1000 - Date.now()));
+    const secure = req.app.get('isProduction') ?? isProduction;
+    res.cookie(COOKIE_NAME, token, cookieOptions(exp * 1000 - Date.now(), secure));
     return res.json({ admin: { id: admin.id, email: admin.email } });
   } catch (err) {
     return next(err);
@@ -47,7 +48,8 @@ async function login(req, res, next) {
 }
 
 function logout(req, res) {
-  res.clearCookie(COOKIE_NAME, cookieOptions());
+  const secure = req.app.get('isProduction') ?? isProduction;
+  res.clearCookie(COOKIE_NAME, cookieOptions(undefined, secure));
   res.json({ ok: true });
 }
 

@@ -1,0 +1,41 @@
+# Blueprint opcional para desplegar en Render (https://render.com).
+# Nota: el disco persistente (requerido para SQLite) solo está disponible en planes de pago (Starter o superior).
+# Completa las variables con `sync: false` desde el panel de Render; nunca pongas secretos aquí.
+
+services:
+  - type: web
+    name: galeria-de-arte
+    runtime: node
+    plan: starter
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: gallery-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PATH
+        value: /var/data/gallery.db
+      - key: BACKUP_DIR
+        value: /var/data/backups
+      - key: JWT_EXPIRES_IN
+        value: 2h
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: WHATSAPP_NUMBER
+        sync: false
+      - key: CORS_ORIGIN
+        value: ""

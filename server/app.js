@@ -17,15 +17,27 @@ function assertConfig() {
   }
 }
 
-function createApp({ loginMaxAttempts, imageService = cloudinaryImageService } = {}) {
+function createApp({ loginMaxAttempts, imageService = cloudinaryImageService, isProduction = env.isProduction } = {}) {
   assertConfig();
   const app = express();
   app.disable('x-powered-by');
-  // Detrás del proxy del hosting (Render, Railway...) para que el rate limit vea la IP real.
-  if (env.isProduction) app.set('trust proxy', 1);
+  app.set('isProduction', isProduction);
+
+  // Detrás del proxy del hosting (Render, Railway, Nginx...) para que el rate limit y HTTPS vean el origen real.
+  if (isProduction) {
+    app.set('trust proxy', 1);
+    app.use((req, res, next) => {
+      const host = req.get('host');
+      if (req.get('x-forwarded-proto') === 'http' && req.path !== '/api/health' && host && !/[\r\n]/.test(host)) {
+        return res.redirect(301, `https://${host}${req.originalUrl}`);
+      }
+      return next();
+    });
+  }
 
   app.use(
     helmet({
+      strictTransportSecurity: isProduction ? { maxAge: 15552000, includeSubDomains: true } : false,
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
@@ -33,7 +45,7 @@ function createApp({ loginMaxAttempts, imageService = cloudinaryImageService } =
           'font-src': ["'self'", 'https://fonts.gstatic.com'],
           'img-src': ["'self'", 'data:', 'blob:', 'https://res.cloudinary.com'],
           // En desarrollo (http) no se fuerza HTTPS
-          'upgrade-insecure-requests': env.isProduction ? [] : null,
+          'upgrade-insecure-requests': isProduction ? [] : null,
         },
       },
     }),
